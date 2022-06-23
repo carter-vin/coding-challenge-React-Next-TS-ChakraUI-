@@ -1,16 +1,4 @@
-import {
-	HStack,
-	Text,
-	VStack,
-	Stack,
-	Image,
-	UnorderedList,
-	ListItem,
-	Button,
-	Box,
-	Link,
-	Center,
-} from '@chakra-ui/react';
+import { Text, VStack, Box, Center } from '@chakra-ui/react';
 import OfferCard from '../components/OfferCard';
 import MainLayout from '../layout/MainLayout';
 import { getNeighbourLocation } from '../utils/getNeighbourLocation';
@@ -59,34 +47,30 @@ interface HomeProps {
 
 const Home = (props: HomeProps) => {
 	const { userAddress, offers, nearLocation } = props;
-	console.log('nearLocation', offers);
 	return (
 		<MainLayout>
-			<Center>
-				<VStack
-					justifyContent="start"
-					alignItems="start"
-					padding={{ base: '12px' }}
-					spacing={6}
-				>
-					<VStack justifyContent="start" alignItems="start">
-						<Text fontSize={['2xl', '4xl']} textTransform="capitalize">
-							BEST Sportsbook offers in {userAddress.state || userAddress.city}
-						</Text>
-						<Text fontSize={['md', 'xl']}>
-							{nearLocation.name} is {nearLocation.distance} miles away from
-							you.
-						</Text>
-					</VStack>
-					<VStack spacing={6}>
-						{(offers || []).map(({ id, fields }: OfferType) => (
-							<Box key={id} width="100%">
-								<OfferCard id={id} fields={fields} />
-							</Box>
-						))}
-					</VStack>
+			<VStack
+				justifyContent="start"
+				alignItems="start"
+				padding={{ base: '12px' }}
+				spacing={6}
+			>
+				<VStack justifyContent="start" alignItems="start">
+					<Text fontSize={['2xl', '4xl']} textTransform="capitalize">
+						BEST Sportsbook offers in {userAddress.state || userAddress.city}
+					</Text>
+					<Text fontSize={['md', 'xl']}>
+						{nearLocation.name} is {nearLocation.distance} miles away from you.
+					</Text>
 				</VStack>
-			</Center>
+				<VStack spacing={6} width="100%">
+					{(offers || []).map(({ id, fields }: OfferType) => (
+						<Box key={id} width="100%">
+							<OfferCard id={id} fields={fields} />
+						</Box>
+					))}
+				</VStack>
+			</VStack>
 		</MainLayout>
 	);
 };

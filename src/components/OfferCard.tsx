@@ -32,14 +32,15 @@ const OfferCard = (props: OfferCard) => {
 			key={id}
 			width="100%"
 		>
-			<Center>
+			<Box width="200px" height="100px">
 				<Image
 					src={fields.Logo[0].url}
 					alt={fields.Name || ''}
-					boxSize={['100px', '100px']}
+					width="100%"
+					height="100%"
 					objectFit="contain"
 				/>
-			</Center>
+			</Box>
 			<VStack justifyContent="start" alignItems="start" flex={1}>
 				<Text fontSize="3xl" textTransform="capitalize">
 					{fields.Promotion}
