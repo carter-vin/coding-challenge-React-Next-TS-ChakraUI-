@@ -1,7 +1,5 @@
-import type { NextPage } from 'next';
 import {
 	HStack,
-	Box,
 	Text,
 	VStack,
 	Image,
@@ -9,15 +7,52 @@ import {
 	ListItem,
 	Button,
 } from '@chakra-ui/react';
+import { getOffers } from '../utils/getOffers';
+import { getUserAddress } from '../utils/getUserAddress';
 
-const Home: NextPage = () => {
-	const neighboutState = [];
+type Thumbnauil = {
+	url: string;
+	width: number;
+	height: number;
+};
+
+type OfferLogo = {
+	thumbnails: {
+		small: Thumbnauil;
+		large: Thumbnauil;
+		full: Thumbnauil;
+	};
+};
+
+type OfferType = {
+	id: string;
+	fields: {
+		CTA: string;
+		URL: string;
+		Promotion: string;
+		Name: string;
+		Logo: any;
+	};
+};
+
+interface HomeProps {
+	userAddress: {
+		state?: string;
+		city: string;
+		loc: string;
+	};
+	offers: OfferType[];
+}
+
+const Home = (props: HomeProps) => {
+	const { userAddress, offers } = props;
+	console.log('the offers', offers);
 	return (
 		<VStack>
 			<VStack justifyContent="start" alignItems="start">
 				<VStack justifyContent="start" alignItems="start">
 					<Text fontSize="4xl" textTransform="capitalize">
-						BEST Sportsbook offers in ...
+						BEST Sportsbook offers in {userAddress.state || userAddress.city}
 					</Text>
 					<Text fontSize="2xl">Neighbour is 2234 miles away from you.</Text>
 				</VStack>
@@ -55,5 +90,16 @@ const Home: NextPage = () => {
 		</VStack>
 	);
 };
+
+export async function getServerSideProps(context: any) {
+	const userAddress = await getUserAddress();
+	const offers = await getOffers();
+	return {
+		props: {
+			userAddress,
+			offers,
+		},
+	};
+}
 
 export default Home;
