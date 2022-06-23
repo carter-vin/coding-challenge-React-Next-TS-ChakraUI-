@@ -5,10 +5,9 @@ export const getNeighbourLocation = async ({ longitude, latitude }: {longitude: 
         url: `http://localhost:3000/api/neighbor_location?longitude=${longitude}&latitude=${latitude}`,
         method: "GET",
     })
-    console.log('the response', res)
     if (res.status === 200 && res.data) {
-        return JSON.stringify(res)
+        return res.data.nearestLocation
     } else {
-        return []
+        return {}
     }
 }

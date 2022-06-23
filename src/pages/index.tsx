@@ -6,10 +6,14 @@ import {
 	UnorderedList,
 	ListItem,
 	Button,
+	Box,
+	Link,
+	Center,
 } from '@chakra-ui/react';
 import { getNeighbourLocation } from '../utils/getNeighbourLocation';
 import { getOffers } from '../utils/getOffers';
 import { getUserAddress } from '../utils/getUserAddress';
+import { LocationType } from './api/neighbor_location';
 
 type Thumbnauil = {
 	url: string;
@@ -45,64 +49,91 @@ interface HomeProps {
 		loc: string;
 	};
 	offers: OfferType[];
+	nearLocation: LocationType;
 }
 
 const Home = (props: HomeProps) => {
-	const { userAddress, offers } = props;
+	const { userAddress, offers, nearLocation } = props;
+	console.log('nearLocation', offers);
 	return (
-		<VStack>
-			<VStack justifyContent="start" alignItems="start">
+		<Center>
+			<VStack
+				justifyContent="start"
+				alignItems="start"
+				padding={{ base: '12px' }}
+			>
 				<VStack justifyContent="start" alignItems="start">
 					<Text fontSize="4xl" textTransform="capitalize">
 						BEST Sportsbook offers in {userAddress.state || userAddress.city}
 					</Text>
-					<Text fontSize="2xl">Neighbour is 2234 miles away from you.</Text>
+					<Text fontSize="2xl">
+						{nearLocation.name} is {nearLocation.distance} miles away from you.
+					</Text>
 				</VStack>
-				<VStack>
+				<VStack spacing={6}>
 					{(offers || []).map(({ id, fields }: OfferType) => (
 						<HStack
-							justifyContent="center"
-							alignItems="center"
 							spacing={16}
 							border="2px"
 							borderColor="gray.200"
 							rounded="lg"
-							padding={4}
+							paddingY={4}
+							paddingX={[4, 8]}
 							key={id}
 						>
 							<Image
 								src={fields.Logo[0].url}
 								alt={fields.Name || ''}
-								boxSize="80px"
+								boxSize={['200px', '100px']}
 								objectFit="contain"
 							/>
-							<VStack justifyContent="start" alignItems="start" flex={1}>
+							<VStack
+								justifyContent="start"
+								alignItems="start"
+								flex={1}
+								width={{
+									base: '100%',
+									md: '500px',
+								}}
+							>
 								<Text fontSize="3xl" textTransform="capitalize">
 									{fields.Promotion}
 								</Text>
-								<UnorderedList>
-									{fields['Promo Details'].map((promo: string) => (
-										<ListItem key={promo}>{promo}</ListItem>
-									))}
-								</UnorderedList>
+								<Box>
+									<UnorderedList>
+										{fields['Promo Details'].map((promo: string) => (
+											<ListItem key={promo}>{promo}</ListItem>
+										))}
+									</UnorderedList>
+								</Box>
 							</VStack>
-							<Button colorScheme="blue" size="lg" textTransform="capitalize">
-								GET Bonus
-							</Button>
+							<Link
+								href={fields.URL}
+								isExternal
+								textDecoration="none"
+								_hover={{
+									textDecoration: 'none',
+								}}
+							>
+								<Button colorScheme="blue" size="lg" textTransform="capitalize">
+									GET Bonus
+								</Button>
+							</Link>
 						</HStack>
 					))}
 				</VStack>
 			</VStack>
-		</VStack>
+		</Center>
 	);
 };
 
 export async function getServerSideProps() {
 	const userAddress = await getUserAddress();
+	const userAddressPinPoint = userAddress?.loc.split(',');
 	const offers = await getOffers();
 	const nearLocation = await getNeighbourLocation({
-		longitude: -92.199997,
-		latitude: 34.799999,
+		longitude: userAddressPinPoint[0] || -92.199997,
+		latitude: userAddressPinPoint[1] || 34.799999,
 	});
 	return {
 		props: {
