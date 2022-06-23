@@ -7,6 +7,7 @@ import {
 	ListItem,
 	Button,
 } from '@chakra-ui/react';
+import { getNeighbourLocation } from '../utils/getNeighbourLocation';
 import { getOffers } from '../utils/getOffers';
 import { getUserAddress } from '../utils/getUserAddress';
 
@@ -17,6 +18,7 @@ type Thumbnauil = {
 };
 
 type OfferLogo = {
+	url: string;
 	thumbnails: {
 		small: Thumbnauil;
 		large: Thumbnauil;
@@ -31,7 +33,8 @@ type OfferType = {
 		URL: string;
 		Promotion: string;
 		Name: string;
-		Logo: any;
+		Logo: OfferLogo[];
+		['Promo Details']: string[];
 	};
 };
 
@@ -46,7 +49,6 @@ interface HomeProps {
 
 const Home = (props: HomeProps) => {
 	const { userAddress, offers } = props;
-	console.log('the offers', offers);
 	return (
 		<VStack>
 			<VStack justifyContent="start" alignItems="start">
@@ -57,34 +59,38 @@ const Home = (props: HomeProps) => {
 					<Text fontSize="2xl">Neighbour is 2234 miles away from you.</Text>
 				</VStack>
 				<VStack>
-					<HStack
-						justifyContent="center"
-						alignItems="center"
-						spacing={16}
-						border="2px"
-						borderColor="gray.200"
-						rounded="lg"
-						padding={4}
-					>
-						<Image
-							src="https://bit.ly/dan-abramov"
-							alt="Dan Abramov"
-							boxSize="80px"
-							objectFit="cover"
-						/>
-						<VStack justifyContent="start" alignItems="start" flex={1}>
-							<Text fontSize="3xl" textTransform="capitalize">
-								BEST Sportsbook offers in ...
-							</Text>
-							<UnorderedList>
-								<ListItem>Lorem ipsum dolor sit amet</ListItem>
-								<ListItem>Consectetur adipiscing elit</ListItem>
-							</UnorderedList>
-						</VStack>
-						<Button colorScheme="blue" size="lg" textTransform="capitalize">
-							GET Bonus
-						</Button>
-					</HStack>
+					{(offers || []).map(({ id, fields }: OfferType) => (
+						<HStack
+							justifyContent="center"
+							alignItems="center"
+							spacing={16}
+							border="2px"
+							borderColor="gray.200"
+							rounded="lg"
+							padding={4}
+							key={id}
+						>
+							<Image
+								src={fields.Logo[0].url}
+								alt={fields.Name || ''}
+								boxSize="80px"
+								objectFit="contain"
+							/>
+							<VStack justifyContent="start" alignItems="start" flex={1}>
+								<Text fontSize="3xl" textTransform="capitalize">
+									{fields.Promotion}
+								</Text>
+								<UnorderedList>
+									{fields['Promo Details'].map((promo: string) => (
+										<ListItem key={promo}>{promo}</ListItem>
+									))}
+								</UnorderedList>
+							</VStack>
+							<Button colorScheme="blue" size="lg" textTransform="capitalize">
+								GET Bonus
+							</Button>
+						</HStack>
+					))}
 				</VStack>
 			</VStack>
 		</VStack>
@@ -94,10 +100,12 @@ const Home = (props: HomeProps) => {
 export async function getServerSideProps(context: any) {
 	const userAddress = await getUserAddress();
 	const offers = await getOffers();
+	const nearLocation = await getNeighbourLocation(-111.093735, 34.048927);
 	return {
 		props: {
 			userAddress,
 			offers,
+			nearLocation,
 		},
 	};
 }

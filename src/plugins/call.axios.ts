@@ -29,11 +29,6 @@ export const callAxios = async <T>({ url, method, data, headers, params, access_
             return res 
         })
         .catch(async err => {
-            // const status = err?.response?.status
-            const message = err?.response?.data?.message
-            if (message) {
-                throw new Error(message)
-            }
-            throw new Error('Network Error')
+            return err
         })
 }
