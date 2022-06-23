@@ -2,6 +2,7 @@ import {
 	HStack,
 	Text,
 	VStack,
+	Stack,
 	Image,
 	UnorderedList,
 	ListItem,
@@ -10,6 +11,8 @@ import {
 	Link,
 	Center,
 } from '@chakra-ui/react';
+import OfferCard from '../components/OfferCard';
+import MainLayout from '../layout/MainLayout';
 import { getNeighbourLocation } from '../utils/getNeighbourLocation';
 import { getOffers } from '../utils/getOffers';
 import { getUserAddress } from '../utils/getUserAddress';
@@ -30,16 +33,18 @@ type OfferLogo = {
 	};
 };
 
+export type FieldType = {
+	CTA: string;
+	URL: string;
+	Promotion: string;
+	Name: string;
+	Logo: OfferLogo[];
+	['Promo Details']: string[];
+};
+
 type OfferType = {
 	id: string;
-	fields: {
-		CTA: string;
-		URL: string;
-		Promotion: string;
-		Name: string;
-		Logo: OfferLogo[];
-		['Promo Details']: string[];
-	};
+	fields: FieldType;
 };
 
 interface HomeProps {
@@ -56,74 +61,33 @@ const Home = (props: HomeProps) => {
 	const { userAddress, offers, nearLocation } = props;
 	console.log('nearLocation', offers);
 	return (
-		<Center>
-			<VStack
-				justifyContent="start"
-				alignItems="start"
-				padding={{ base: '12px' }}
-			>
-				<VStack justifyContent="start" alignItems="start">
-					<Text fontSize="4xl" textTransform="capitalize">
-						BEST Sportsbook offers in {userAddress.state || userAddress.city}
-					</Text>
-					<Text fontSize="2xl">
-						{nearLocation.name} is {nearLocation.distance} miles away from you.
-					</Text>
+		<MainLayout>
+			<Center>
+				<VStack
+					justifyContent="start"
+					alignItems="start"
+					padding={{ base: '12px' }}
+					spacing={6}
+				>
+					<VStack justifyContent="start" alignItems="start">
+						<Text fontSize={['2xl', '4xl']} textTransform="capitalize">
+							BEST Sportsbook offers in {userAddress.state || userAddress.city}
+						</Text>
+						<Text fontSize={['md', 'xl']}>
+							{nearLocation.name} is {nearLocation.distance} miles away from
+							you.
+						</Text>
+					</VStack>
+					<VStack spacing={6}>
+						{(offers || []).map(({ id, fields }: OfferType) => (
+							<Box key={id} width="100%">
+								<OfferCard id={id} fields={fields} />
+							</Box>
+						))}
+					</VStack>
 				</VStack>
-				<VStack spacing={6}>
-					{(offers || []).map(({ id, fields }: OfferType) => (
-						<HStack
-							spacing={16}
-							border="2px"
-							borderColor="gray.200"
-							rounded="lg"
-							paddingY={4}
-							paddingX={[4, 8]}
-							key={id}
-						>
-							<Image
-								src={fields.Logo[0].url}
-								alt={fields.Name || ''}
-								boxSize={['200px', '100px']}
-								objectFit="contain"
-							/>
-							<VStack
-								justifyContent="start"
-								alignItems="start"
-								flex={1}
-								width={{
-									base: '100%',
-									md: '500px',
-								}}
-							>
-								<Text fontSize="3xl" textTransform="capitalize">
-									{fields.Promotion}
-								</Text>
-								<Box>
-									<UnorderedList>
-										{fields['Promo Details'].map((promo: string) => (
-											<ListItem key={promo}>{promo}</ListItem>
-										))}
-									</UnorderedList>
-								</Box>
-							</VStack>
-							<Link
-								href={fields.URL}
-								isExternal
-								textDecoration="none"
-								_hover={{
-									textDecoration: 'none',
-								}}
-							>
-								<Button colorScheme="blue" size="lg" textTransform="capitalize">
-									GET Bonus
-								</Button>
-							</Link>
-						</HStack>
-					))}
-				</VStack>
-			</VStack>
-		</Center>
+			</Center>
+		</MainLayout>
 	);
 };
 
