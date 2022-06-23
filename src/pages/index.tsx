@@ -97,10 +97,13 @@ const Home = (props: HomeProps) => {
 	);
 };
 
-export async function getServerSideProps(context: any) {
+export async function getServerSideProps() {
 	const userAddress = await getUserAddress();
 	const offers = await getOffers();
-	const nearLocation = await getNeighbourLocation(-111.093735, 34.048927);
+	const nearLocation = await getNeighbourLocation({
+		longitude: -92.199997,
+		latitude: 34.799999,
+	});
 	return {
 		props: {
 			userAddress,

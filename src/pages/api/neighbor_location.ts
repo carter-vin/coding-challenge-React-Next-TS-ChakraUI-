@@ -1,9 +1,12 @@
+import haversine from 'haversine-distance'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import states from "../../../states.json"
 
 type Data = {
     message?: string
     status?: number
     name?: string
+    nearestLocation?:any
 }
 
 
@@ -12,9 +15,24 @@ const findNearLocation = (req: NextApiRequest, res: NextApiResponse<Data>) => {
     const { longitude, latitude } = query
     console.log('the data', {
         longitude,
-        latitude
+        latitude,
+        states
     })
-    res.status(200).json({ name: 'John Doe' })
+    const distance = states.map(state => {
+        return haversine({ lat: parseInt(String(latitude), 10), lng: parseInt(String(longitude), 10) }, { lat: state.latitude, lng: state.longitude })
+    })
+    const closest = Math.min(...distance) 
+    const closestLocationIndex = distance.indexOf(closest)
+        const nearestLocation = states[closestLocationIndex]
+
+    console.log('the distance & closest', {
+        closest,
+        distance,
+        closestLocationIndex,
+        nearestLocation
+    });
+    
+    res.status(200).json({ nearestLocation })
 }
 
 export default function handler(
